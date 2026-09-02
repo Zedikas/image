@@ -13,6 +13,23 @@ mkdir -p "$SRC" "$OUT"
 
 git clone --depth 1 --branch "$IM_VERSION" https://github.com/ImageMagick/ImageMagick.git "$SRC"
 
+# ImageMagick's configure test detects getentropy() on the macOS build host and
+# enables MAGICKCORE_HAVE_GETENTROPY. On iOS, getentropy() is declared by
+# <unistd.h>, while <sys/random.h> is not provided by the iPhoneOS SDK.
+# Remove the non-portable include before configuring/building for Apple SDKs.
+if [[ "$OSTYPE" == darwin* ]]; then
+  python3 - "$SRC/MagickCore/random.c" <<'PY'
+from pathlib import Path
+p = Path(__import__('sys').argv[1])
+s = p.read_text()
+s = s.replace(
+    '#if defined(MAGICKCORE_HAVE_GETENTROPY)\n#include <sys/random.h>\n#endif',
+    '#if defined(MAGICKCORE_HAVE_GETENTROPY) && !defined(__APPLE__)\n#include <sys/random.h>\n#endif'
+)
+p.write_text(s)
+PY
+fi
+
 build_one() {
   local sdk="$1"
   local arch="$2"
@@ -33,10 +50,25 @@ build_one() {
   make distclean >/dev/null 2>&1 || true
   git clean -fdx >/dev/null 2>&1 || true
 
+  # git clean above restores the checked-out source, so reapply the iOS
+  # compatibility patch after every clean/reconfigure cycle.
+  if [[ "$OSTYPE" == darwin* ]]; then
+    python3 - "MagickCore/random.c" <<'PY'
+from pathlib import Path
+p = Path(__import__('sys').argv[1])
+s = p.read_text()
+s = s.replace(
+    '#if defined(MAGICKCORE_HAVE_GETENTROPY)\n#include <sys/random.h>\n#endif',
+    '#if defined(MAGICKCORE_HAVE_GETENTROPY) && !defined(__APPLE__)\n#include <sys/random.h>\n#endif'
+)
+p.write_text(s)
+PY
+  fi
+
   ./configure \
     --host="$platform" \
     CC="$clang" \
-    CFLAGS="-arch $arch -isysroot $sysroot -mios-version-min=17.0 -O2 -fembed-bitcode" \
+    CFLAGS="-arch $arch -isysroot $sysroot -mios-version-min=17.0 -O2" \
     CPPFLAGS="-arch $arch -isysroot $sysroot -mios-version-min=17.0" \
     LDFLAGS="-arch $arch -isysroot $sysroot -mios-version-min=17.0" \
     --prefix="$prefix" \
@@ -65,13 +97,9 @@ build_one() {
     --without-lqr \
     --without-djvu \
     --without-fftw \
-    --without-fp16 \
     --without-fpx \
     --without-gslib \
     --without-gvc \
-    --without-ltdl \
-    --without-opencl \
-    --without-openmp \
     --without-zip
 
   make -j"$(sysctl -n hw.ncpu)"
