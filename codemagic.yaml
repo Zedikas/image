@@ -12,21 +12,38 @@ workflows:
     scripts:
       - name: Build ImageMagick static libraries
         script: |
-          chmod +x scripts/build_imagemagick_ios.sh
-          IM_VERSION="main" ./scripts/build_imagemagick_ios.sh
+          set -o pipefail
+          mkdir -p "$CM_BUILD_DIR/codemagic_logs"
+          {
+            echo "===== ImageMagick build started: $(date) ====="
+            chmod +x scripts/build_imagemagick_ios.sh
+            IM_VERSION="main" ./scripts/build_imagemagick_ios.sh
+            status=${PIPESTATUS[0]}
+            echo "===== ImageMagick build finished with exit code: $status ====="
+            exit "$status"
+          } 2>&1 | tee "$CM_BUILD_DIR/codemagic_logs/imagemagick-build.log"
       - name: Build unsigned iOS app
         script: |
-          xcodebuild \
-            -project "$CM_BUILD_DIR/$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            build
+          set -o pipefail
+          mkdir -p "$CM_BUILD_DIR/codemagic_logs"
+          {
+            echo "===== Xcode build started: $(date) ====="
+            xcodebuild \
+              -project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+              -scheme "$XCODE_SCHEME" \
+              -configuration Release \
+              -sdk iphoneos \
+              -destination 'generic/platform=iOS' \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              build
+            status=${PIPESTATUS[0]}
+            echo "===== Xcode build finished with exit code: $status ====="
+            exit "$status"
+          } 2>&1 | tee "$CM_BUILD_DIR/codemagic_logs/xcodebuild.log"
     artifacts:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Release-iphoneos/*.app
+      - $CM_BUILD_DIR/codemagic_logs/*.log
       - /tmp/xcodebuild_logs/*.log
 
   ios_release:
@@ -45,16 +62,33 @@ workflows:
     scripts:
       - name: Build ImageMagick static libraries
         script: |
-          chmod +x scripts/build_imagemagick_ios.sh
-          IM_VERSION="main" ./scripts/build_imagemagick_ios.sh
+          set -o pipefail
+          mkdir -p "$CM_BUILD_DIR/codemagic_logs"
+          {
+            echo "===== ImageMagick build started: $(date) ====="
+            chmod +x scripts/build_imagemagick_ios.sh
+            IM_VERSION="main" ./scripts/build_imagemagick_ios.sh
+            status=${PIPESTATUS[0]}
+            echo "===== ImageMagick build finished with exit code: $status ====="
+            exit "$status"
+          } 2>&1 | tee "$CM_BUILD_DIR/codemagic_logs/imagemagick-build.log"
       - name: Apply signing profiles
         script: xcode-project use-profiles
       - name: Build IPA
         script: |
-          xcode-project build-ipa \
-            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+          set -o pipefail
+          mkdir -p "$CM_BUILD_DIR/codemagic_logs"
+          {
+            echo "===== IPA build started: $(date) ====="
+            xcode-project build-ipa \
+              --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+              --scheme "$XCODE_SCHEME"
+            status=${PIPESTATUS[0]}
+            echo "===== IPA build finished with exit code: $status ====="
+            exit "$status"
+          } 2>&1 | tee "$CM_BUILD_DIR/codemagic_logs/ipa-build.log"
     artifacts:
       - build/ios/ipa/*.ipa
+      - $CM_BUILD_DIR/codemagic_logs/*.log
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
