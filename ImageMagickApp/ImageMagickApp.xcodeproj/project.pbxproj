@@ -95,7 +95,7 @@
         hasScannedForEncodings = 0;
         knownRegions = (en, Base);
         mainGroup = 457998DD3B124E94972A37CB;
-        productRefGroup = 65402D5911364AB5A07B7218;
+        productRefGroup = 65402D5911364AB5A07B7218 /* Products */;
         projectDirPath = "";
         projectRoot = "";
         targets = (6799E59AB15745208B42AC85);
@@ -114,7 +114,7 @@
         isa = PBXSourcesBuildPhase;
         buildActionMask = 2147483647;
         files = (
-            B4DB847B636745F9A1FCE621 /* ImageMagickApp.swift in Sources */,
+            B4DB847B6367451299074172 /* ImageMagickApp.swift in Sources */,
             CBBD77A6860E4724BDA18080 /* ContentView.swift in Sources */,
             58C30BDD04214691BA3BD3F7 /* IMBridge.c in Sources */,
         );
@@ -188,8 +188,8 @@
             CODE_SIGN_ENTITLEMENTS = ImageMagickApp/ImageMagickApp.entitlements;
             HEADER_SEARCH_PATHS = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphoneos/include";
             LIBRARY_SEARCH_PATHS = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphoneos/lib";
-            LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*] = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphonesimulator/lib";
             HEADER_SEARCH_PATHS[sdk=iphonesimulator*] = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphonesimulator/include";
+            LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*] = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphonesimulator/lib";
             OTHER_CFLAGS = "-Dmacintosh=1";
             OTHER_LDFLAGS = (
                 "-lMagickWand-7.Q8",
