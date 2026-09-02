@@ -88,7 +88,6 @@
             ORGANIZATIONNAME = Zedikas;
             TargetAttributes = {
                 6799E59AB15745208B42AC85 = { CreatedOnToolsVersion = 26.0; };
-            };
         };
         buildConfigurationList = E6124981285840E88FEE6183 /* Build configuration list for PBXProject "ImageMagickApp" */;
         compatibilityVersion = "Xcode 16.0";
@@ -163,6 +162,7 @@
     74FCC6302C77497981B3CB73 /* Debug */ = {
         isa = XCBuildConfiguration;
         buildSettings = {
+            ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
             CLANG_ENABLE_MODULES = YES;
             CODE_SIGN_ENTITLEMENTS = ImageMagickApp/ImageMagickApp.entitlements;
             HEADER_SEARCH_PATHS = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphoneos/include";
@@ -183,6 +183,7 @@
     EF3B5AF59D5F4E378D8DE92B /* Release */ = {
         isa = XCBuildConfiguration;
         buildSettings = {
+            ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
             CLANG_ENABLE_MODULES = YES;
             CODE_SIGN_ENTITLEMENTS = ImageMagickApp/ImageMagickApp.entitlements;
             HEADER_SEARCH_PATHS = "$(SRCROOT)/ImageMagickApp/Vendor/ImageMagickBuild/iphoneos/include";
